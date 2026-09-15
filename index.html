@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-OS (Debian Edition)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        /* Desktop Background with your image */
+        #desktop {
+            width: 100vw;
+            height: calc(100vh - 30px);
+            position: relative;
+            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('41616.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
+        /* Top Status Bar */
+        #top-bar {
+            height: 30px;
+            background-color: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            user-select: none;
+            z-index: 2000;
+            position: relative;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        /* Red Cross Logo in Top Bar */
+        .logo-svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Dock / Taskbar */
+        #dock {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30, 30, 30, 0.75);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 8px 15px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .dock-icon {
+            width: 45px;
+            height: 45px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            font-size: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .dock-icon:hover {
+            transform: translateY(-5px);
+            background: #3a3a3a;
+        }
+
+        /* Windows */
+        .window {
+            position: absolute;
+            width: 620px;
+            height: 420px;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .window-header {
+            height: 35px;
+            background: #2d2d2d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            cursor: move;
+            border-bottom: 1px solid #3c3c3c;
+            user-select: none;
+        }
+
+        .window-title {
+            font-size: 13px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-minimize { background: #ffbd2e; }
+        .btn-maximize { background: #27c93f; }
+
+        .window-body {
+            flex: 1;
+            background: #141414;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+        }
+
+        /* Terminal Style */
+        .terminal-output {
+            color: #00ff66;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+
+        .terminal-input-line {
+            display: flex;
+            gap: 5px;
+            color: #00ff66;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            outline: none;
+            flex: 1;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+        }
+
+        /* Mock Firefox Browser Style */
+        .browser-toolbar {
+            background: #2d2d2d;
+            padding: 8px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #3c3c3c;
+        }
+
+        .browser-url {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 4px 10px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .browser-content {
+            flex: 1;
+            background: #ffffff;
+            color: #000;
+            padding: 20px;
+            font-family: sans-serif;
+            overflow-y: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Status Bar -->
+    <div id="top-bar">
+        <div class="status-left">
+            <!-- Red Cross Logo -->
+            <svg class="logo-svg" viewBox="0 0 500 500">
+                <path d="M250,0 C280,150 350,220 500,250 C350,280 280,350 250,500 C220,350 150,280 0,250 C150,220 220,150 250,0 Z" fill="#ff0000"/>
+            </svg>
+            <span>Cross-OS (Debian GNU/Linux)</span>
+        </div>
+        <div id="clock">00:00:00</div>
+    </div>
+
+    <!-- Desktop Area -->
+    <div id="desktop">
+
+        <!-- Terminal Window -->
+        <div id="window-terminal" class="window" style="top: 50px; left: 50px;">
+            <div class="window-header" onmousedown="bringToFront('window-terminal')">
+                <div class="window-title">
+                    <span>💻</span> bash - cross-os@debian:~
+                </div>
+                <div class="window-controls">
+                    <div class="btn-control btn-minimize" onclick="closeWindow('window-terminal')"></div>
+                    <div class="btn-control btn-maximize"></div>
+                    <div class="btn-control btn-close" onclick="closeWindow('window-terminal')"></div>
+                </div>
+            </div>
+            <div class="window-body" id="term-body">
+                <div class="terminal-output">Cross-OS GNU/Linux 6.1.0-debian (tty1)
+Type "help" or run "neofetch" to check your hardware profile.
+</div>
+                <div class="terminal-input-line">
+                    <span>cross-os:~$</span>
+                    <input type="text" class="terminal-input" id="term-input" autofocus onkeydown="handleTerminal(event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Firefox Window -->
+        <div id="window-firefox" class="window hidden" style="top: 100px; left: 120px;">
+            <div class="window-header" onmousedown="bringToFront('window-firefox')">
+                <div class="window-title">
+                    <span>🦊</span> Mozilla Firefox - Cross-OS Browser
+                </div>
+                <div class="window-controls">
+                    <div class="btn-control btn-minimize" onclick="closeWindow('window-firefox')"></div>
+                    <div class="btn-control btn-maximize"></div>
+                    <div class="btn-control btn-close" onclick="closeWindow('window-firefox')"></div>
+                </div>
+            </div>
+            <div class="browser-toolbar">
+                <button style="background:none; border:none; color:#ccc; cursor:pointer;">⬅️</button>
+                <button style="background:none; border:none; color:#ccc; cursor:pointer;">➡️</button>
+                <button style="background:none; border:none; color:#ccc; cursor:pointer;">🔄</button>
+                <input type="text" class="browser-url" value="https://www.debian.org" readonly>
+            </div>
+            <div class="browser-content">
+                <h1 style="color: #005a9c; margin-bottom: 10px;">The Universal Operating System</h1>
+                <p>Welcome to Firefox running inside <strong>Cross-OS</strong> (Debian Core).</p>
+                <hr style="margin: 15px 0;">
+                <p><strong>System Hardware Profile:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px; font-size: 14px;">
+                    <li>Processor: Intel Core i7 (11th Gen)</li>
+                    <li>Memory: 16 GB RAM</li>
+                    <li>Graphics: NVIDIA GeForce RTX 4050 (6 GB GDDR6 VRAM)</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Dock / Taskbar -->
+    <div id="dock">
+        <div class="dock-icon" onclick="openWindow('window-terminal')" title="Terminal">💻</div>
+        <div class="dock-icon" onclick="openWindow('window-firefox')" title="Firefox">🦊</div>
+    </div>
+
+    <script>
+        // Live Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        // Window Management
+        let highestZ = 10;
+
+        function bringToFront(id) {
+            const win = document.getElementById(id);
+            highestZ++;
+            win.style.zIndex = highestZ;
+        }
+
+        function openWindow(id) {
+            const win = document.getElementById(id);
+            win.classList.remove('hidden');
+            bringToFront(id);
+        }
+
+        function closeWindow(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Terminal logic
+        function handleTerminal(e) {
+            if (e.key === 'Enter') {
+                const inputElem = document.getElementById('term-input');
+                const termBody = document.getElementById('term-body');
+                const command = inputElem.value.trim();
+
+                const cmdLine = document.createElement('div');
+                cmdLine.innerHTML = `<span style="color:#fff;">cross-os:~$</span> ${command}`;
+                termBody.insertBefore(cmdLine, inputElem.parentElement);
+
+                const outputLine = document.createElement('div');
+                outputLine.style.color = "#00ff66";
+                outputLine.style.marginBottom = "10px";
+
+                if (command === 'help') {
+                    outputLine.innerText = "Available commands:\n  uname -a  : Print OS version\n  neofetch  : Display custom hardware spec profile\n  clear     : Clear terminal screen\n  firefox   : Launch browser\n  date      : Show current date";
+                } else if (command === 'uname -a') {
+                    outputLine.innerText = "Linux cross-os 6.1.0-debian-amd64 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux";
+                } else if (command === 'neofetch') {
+                    outputLine.innerText = `
+       /\\         cross-os@debian
+      /  \\        ----------------
+     /\\   \\       OS: Cross-OS (Debian Core)
+    /      \\      Host: Custom PC Build Simulation
+   /   ,,   \\     Kernel: 6.1.0-debian
+  /   |  |   \\    CPU: 11th Gen Intel i7
+ /_-''    ''-_\\   Memory: 16 GB RAM
+                  GPU: NVIDIA RTX 4050 (6 GB GDDR6)
+                  Shell: bash 5.2.15
+                  Browser: Firefox (pre-installed)
+`;
+                } else if (command === 'clear') {
+                    termBody.innerHTML = '';
+                    termBody.appendChild(inputElem.parentElement);
+                    inputElem.value = '';
+                    return;
+                } else if (command === 'firefox') {
+                    openWindow('window-firefox');
+                    outputLine.innerText = "Launching Firefox...";
+                } else if (command === 'date') {
+                    outputLine.innerText = new Date().toString();
+                } else if (command === '') {
+                    outputLine.innerText = "";
+                } else {
+                    outputLine.style.color = "#ff5f56";
+                    outputLine.innerText = `bash: ${command}: command not found. Type 'help' for available commands.`;
+                }
+
+                termBody.insertBefore(outputLine, inputElem.parentElement);
+                inputElem.value = '';
+                termBody.scrollTop = termBody.scrollHeight;
+            }
+        }
+
+        // Basic Dragging Functionality for Windows
+        document.querySelectorAll('.window-header').forEach(header => {
+            let isDragging = false;
+            let startX, startY;
+            const windowElem = header.parentElement;
+
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX - windowElem.offsetLeft;
+                startY = e.clientY - windowElem.offsetTop;
+                bringToFront(windowElem.id);
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                windowElem.style.left = `${e.clientX - startX}px`;
+                windowElem.style.top = `${e.clientY - startY}px`;
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        });
+    </script>
+</body>
+</html>
