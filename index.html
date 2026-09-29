@@ -285,7 +285,7 @@ Type "help" or run "neofetch" to check your hardware profile.
                 <button style="background:none; border:none; color:#ccc; cursor:pointer;">⬅️</button>
                 <button style="background:none; border:none; color:#ccc; cursor:pointer;">➡️</button>
                 <button style="background:none; border:none; color:#ccc; cursor:pointer;">🔄</button>
-                <input type="text" class="browser-url" value="https://www.debian.org" readonly>
+                <input type="text" class="browser-url" value="[https://www.debian.org](https://www.debian.org)" readonly>
             </div>
             <div class="browser-content">
                 <h1 style="color: #005a9c; margin-bottom: 10px;">The Universal Operating System</h1>
@@ -384,7 +384,7 @@ Type "help" or run "neofetch" to check your hardware profile.
               "  /====  ||  ====\\   (   )  (  (      ",
               " |  ||   ||   ||  | ( )  (    )       ",
               " |__||___||___||__|_____[___]___      ",
-              "  [__________________________]========"",
+              "  [__________________________]========",
               "   (O) (O) (O) (O) (O) (O) (O)        "
             ].join("\n");
 
@@ -439,7 +439,7 @@ Type "help" or run "neofetch" to check your hardware profile.
                     const pkg = command.startsWith('sudo') ? parts.slice(3).join(' ') : parts.slice(2).join(' ');
 
                     if (subCmd === 'update') {
-                        outputLine.innerText = "Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]\nGet:2 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]\nReading package lists... Done\nBuilding dependency tree... Done\nAll packages are up to date.";
+                        outputLine.innerText = "Get:1 [http://deb.debian.org/debian](http://deb.debian.org/debian) bookworm InRelease [151 kB]\nGet:2 [http://deb.debian.org/debian-security](http://deb.debian.org/debian-security) bookworm-security InRelease [48.0 kB]\nReading package lists... Done\nBuilding dependency tree... Done\nAll packages are up to date.";
                     } else if (subCmd === 'upgrade') {
                         outputLine.innerText = "Reading package lists... Done\nBuilding dependency tree... Done\nCalculating upgrade... Done\n0 upgraded, 0 newly installed, 0 to remove.";
                     } else if (subCmd === 'install') {
@@ -456,20 +456,7 @@ Type "help" or run "neofetch" to check your hardware profile.
                 } else if (command === 'uname -a') {
                     outputLine.innerText = "Linux cross-os 6.1.0-debian-amd64 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux";
                 } else if (command === 'neofetch') {
-                    outputLine.innerText =
-`         _,met$$$$$gg.           cross-os@debian
-      ,g$$$$$$$$$$$$$$$p.        ----------------
-    ,g$$$$"     ""$$$$$$.        OS: Cross-OS (Debian GNU/Linux 12)
-  ,g$$$$"         "$$$$$$        Host: Custom PC Build Simulation
- ,$$$$"             "$$$$        Kernel: 6.1.0-debian
- $$$$"               "$$$        Uptime: 42 mins
- $$$$                 $$$        Packages: 1420 (dpkg)
- $$$$                 $$$        Shell: bash 5.2.15
- $$$$.               ,$$$        CPU: 11th Gen Intel i7
-  $$$$g.           ,g$$$"        GPU: NVIDIA RTX 4050 (6 GB GDDR6)
-   "$$$$$p.     ,g$$$$"          Memory: 4096MB / 16384MB
-     "$$$$$$$$$$$$$$"
-        ""$$$$$$""`;
+                    outputLine.innerText = "         _,met$$$$$gg.           cross-os@debian\n      ,g$$$$$$$$$$$$$$$p.        ----------------\n    ,g$$$$\"     \"\"$$$$$$.        OS: Cross-OS (Debian GNU/Linux 12)\n  ,g$$$$\"         \"$$$$$$Host: Custom PC Build Simulation\n ,$$$$\"             \"$$$$        Kernel: 6.1.0-debian\n $$$$\"               \"$$$Uptime: 42 mins\n$$$$                 $$$Packages: 1420 (dpkg)\n$$$$                 $$$        Shell: bash 5.2.15\n $$$$.               ,$$$CPU: 11th Gen Intel i7\n$$$$g.           ,g$$$\"        GPU: NVIDIA RTX 4050 (6 GB GDDR6)\n   \"$$$$$p.     ,g$$$$\"          Memory: 4096MB / 16384MB\n     \"$$$$$$$$$$$$$$\"\n        \"\"$$$$$$\"\"";
                 } else if (command === 'clear') {
                     termBody.innerHTML = '';
                     termBody.appendChild(inputElem.parentElement);
