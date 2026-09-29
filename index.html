@@ -1,3 +1,6 @@
+
+
+>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,8 +28,42 @@
             width: 100vw;
             height: calc(100vh - 30px);
             position: relative;
-            background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('41616.jpg') no-repeat center center;
+            background:
+                radial-gradient(circle at 50% 43%, rgba(255, 40, 40, 0.20) 0 9%, transparent 20%),
+                radial-gradient(circle at 50% 43%, rgba(255, 0, 0, 0.10) 0 22%, transparent 42%),
+                linear-gradient(135deg, #090c11 0%, #1b2028 48%, #07090d 100%);
             background-size: cover;
+        }
+
+        /* Cross-OS built-in wallpaper emblem (no image file required) */
+        #desktop::before {
+            content: "✣";
+            position: absolute;
+            left: 50%;
+            top: 43%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            font-size: min(32vw, 360px);
+            font-weight: 900;
+            color: rgba(255, 25, 25, 0.92);
+            text-shadow: 0 0 35px rgba(255, 0, 0, 0.22);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #desktop::after {
+            content: "CROSS-OS";
+            position: absolute;
+            left: 50%;
+            top: 67%;
+            transform: translateX(-50%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: clamp(20px, 3vw, 48px);
+            font-weight: 700;
+            letter-spacing: 12px;
+            color: rgba(255,255,255,0.82);
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* Top Status Bar */
@@ -156,7 +193,10 @@
 
         /* Terminal Style & Background */
         #window-terminal .window-body {
-            background: linear-gradient(rgba(15, 15, 20, 0.88), rgba(15, 15, 20, 0.88)), url('41616.jpg') no-repeat center center;
+            background:
+                linear-gradient(rgba(15, 15, 20, 0.88), rgba(15, 15, 20, 0.88)),
+                radial-gradient(circle at 50% 45%, rgba(255, 30, 30, 0.18), transparent 45%),
+                #101319;
             background-size: cover;
         }
 
