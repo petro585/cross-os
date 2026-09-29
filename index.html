@@ -154,11 +154,18 @@
             font-size: 13px;
         }
 
-        /* Terminal Style */
+        /* Terminal Style & Background */
+        #window-terminal .window-body {
+            background: linear-gradient(rgba(15, 15, 20, 0.88), rgba(15, 15, 20, 0.88)), url('41616.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
         .terminal-output {
             color: #00ff66;
-            white-space: pre-wrap;
+            white-space: pre;
             margin-bottom: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.2;
         }
 
         .terminal-input-line {
@@ -204,6 +211,17 @@
             padding: 20px;
             font-family: sans-serif;
             overflow-y: auto;
+        }
+
+        .app-window-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #181818;
+            color: #eee;
+            gap: 15px;
         }
 
         .hidden {
@@ -282,12 +300,53 @@ Type "help" or run "neofetch" to check your hardware profile.
             </div>
         </div>
 
+        <!-- GIMP Window -->
+        <div id="window-gimp" class="window hidden" style="top: 80px; left: 160px;">
+            <div class="window-header" onmousedown="bringToFront('window-gimp')">
+                <div class="window-title">
+                    <span>🎨</span> GNU Image Manipulation Program (GIMP)
+                </div>
+                <div class="window-controls">
+                    <div class="btn-control btn-minimize" onclick="closeWindow('window-gimp')"></div>
+                    <div class="btn-control btn-maximize"></div>
+                    <div class="btn-control btn-close" onclick="closeWindow('window-gimp')"></div>
+                </div>
+            </div>
+            <div class="app-window-content">
+                <div style="font-size: 48px;">🎨</div>
+                <h2>GIMP 2.10</h2>
+                <p>GNU Image Manipulation Program loaded successfully.</p>
+            </div>
+        </div>
+
+        <!-- Minecraft Window -->
+        <div id="window-minecraft" class="window hidden" style="top: 120px; left: 200px;">
+            <div class="window-header" onmousedown="bringToFront('window-minecraft')">
+                <div class="window-title">
+                    <span>⛏️</span> Minecraft Launcher
+                </div>
+                <div class="window-controls">
+                    <div class="btn-control btn-minimize" onclick="closeWindow('window-minecraft')"></div>
+                    <div class="btn-control btn-maximize"></div>
+                    <div class="btn-control btn-close" onclick="closeWindow('window-minecraft')"></div>
+                </div>
+            </div>
+            <div class="app-window-content" style="background: #111;">
+                <div style="font-size: 48px;">🟩</div>
+                <h2 style="color: #55FF55;">MINECRAFT</h2>
+                <p>Ready to play Java Edition</p>
+                <button style="padding: 10px 30px; background: #2e7d32; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">PLAY</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- Dock / Taskbar -->
     <div id="dock">
         <div class="dock-icon" onclick="openWindow('window-terminal')" title="Terminal">💻</div>
         <div class="dock-icon" onclick="openWindow('window-firefox')" title="Firefox">🦊</div>
+        <div class="dock-icon" onclick="openWindow('window-gimp')" title="GIMP">🎨</div>
+        <div class="dock-icon" onclick="openWindow('window-minecraft')" title="Minecraft">⛏️</div>
     </div>
 
     <script>
@@ -316,38 +375,101 @@ Type "help" or run "neofetch" to check your hardware profile.
             document.getElementById(id).classList.add('hidden');
         }
 
+        // Animated Steam Locomotive for `sl` command
+        function runSlTrain(termBody, inputElem) {
+            const trainAscii = [
+              "      ======     WORK IN PROGRESS      ",
+              "     ||  ||                            ",
+              "   /------------\\     (  ) (   ) )    ",
+              "  /====  ||  ====\\   (   )  (  (      ",
+              " |  ||   ||   ||  | ( )  (    )       ",
+              " |__||___||___||__|_____[___]___      ",
+              "  [__________________________]========"",
+              "   (O) (O) (O) (O) (O) (O) (O)        "
+            ].join("\n");
+
+            const animDiv = document.createElement('pre');
+            animDiv.style.color = "#ffbd2e";
+            animDiv.style.fontFamily = "'Courier New', Courier, monospace";
+            animDiv.style.marginBottom = "10px";
+            termBody.insertBefore(animDiv, inputElem.parentElement);
+
+            let pos = 60;
+            const interval = setInterval(() => {
+                if (pos < -40) {
+                    clearInterval(interval);
+                    animDiv.remove();
+                    termBody.scrollTop = termBody.scrollHeight;
+                } else {
+                    const spaces = " ".repeat(Math.max(0, pos));
+                    animDiv.innerText = trainAscii.split('\n').map(line => spaces + line).join('\n');
+                    pos -= 2;
+                    termBody.scrollTop = termBody.scrollHeight;
+                }
+            }, 50);
+        }
+
         // Terminal logic
         function handleTerminal(e) {
             if (e.key === 'Enter') {
                 const inputElem = document.getElementById('term-input');
                 const termBody = document.getElementById('term-body');
-                const command = inputElem.value.trim();
+                const rawCommand = inputElem.value;
+                const command = rawCommand.trim();
 
                 const cmdLine = document.createElement('div');
                 cmdLine.innerHTML = `<span style="color:#fff;">cross-os:~$</span> ${command}`;
                 termBody.insertBefore(cmdLine, inputElem.parentElement);
 
                 const outputLine = document.createElement('div');
-                outputLine.style.color = "#00ff66";
-                outputLine.style.marginBottom = "10px";
+                outputLine.className = "terminal-output";
 
+                // Command handling
                 if (command === 'help') {
-                    outputLine.innerText = "Available commands:\n  uname -a  : Print OS version\n  neofetch  : Display custom hardware spec profile\n  clear     : Clear terminal screen\n  firefox   : Launch browser\n  date      : Show current date";
+                    outputLine.innerText = "Available commands:\n  uname -a     : Print OS version\n  neofetch     : Display hardware spec profile\n  ls           : List directory contents\n  sl           : Steam Locomotive animation\n  sudo apt ... : Package management (update, upgrade, install)\n  clear        : Clear terminal screen\n  firefox      : Launch browser\n  gimp         : Launch GIMP\n  minecraft    : Launch Minecraft\n  date         : Show current date";
+                } else if (command === 'ls') {
+                    outputLine.innerText = "Desktop  Documents  Downloads  Music  Pictures  Videos  41616.jpg";
+                } else if (command === 'sl') {
+                    runSlTrain(termBody, inputElem);
+                    inputElem.value = '';
+                    return;
+                } else if (command.startsWith('sudo apt') || command.startsWith('apt')) {
+                    const parts = command.split(/\s+/);
+                    const subCmd = command.startsWith('sudo') ? parts[2] : parts[1];
+                    const pkg = command.startsWith('sudo') ? parts.slice(3).join(' ') : parts.slice(2).join(' ');
+
+                    if (subCmd === 'update') {
+                        outputLine.innerText = "Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]\nGet:2 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]\nReading package lists... Done\nBuilding dependency tree... Done\nAll packages are up to date.";
+                    } else if (subCmd === 'upgrade') {
+                        outputLine.innerText = "Reading package lists... Done\nBuilding dependency tree... Done\nCalculating upgrade... Done\n0 upgraded, 0 newly installed, 0 to remove.";
+                    } else if (subCmd === 'install') {
+                        if (!pkg) {
+                            outputLine.style.color = "#ff5f56";
+                            outputLine.innerText = "apt install: missing package name argument.";
+                        } else {
+                            outputLine.innerText = `Reading package lists... Done\nBuilding dependency tree... Done\nSelecting previously unselected package ${pkg}.\nUnpacking ${pkg}...\nSetting up ${pkg}...\nProcessing triggers for desktop-file-utils... Done`;
+                        }
+                    } else {
+                        outputLine.style.color = "#ff5f56";
+                        outputLine.innerText = `apt: unknown subcommand '${subCmd || ''}'. Try 'update', 'upgrade', or 'install'.`;
+                    }
                 } else if (command === 'uname -a') {
                     outputLine.innerText = "Linux cross-os 6.1.0-debian-amd64 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux";
                 } else if (command === 'neofetch') {
-                    outputLine.innerText = `
-       /\\         cross-os@debian
-      /  \\        ----------------
-     /\\   \\       OS: Cross-OS (Debian Core)
-    /      \\      Host: Custom PC Build Simulation
-   /   ,,   \\     Kernel: 6.1.0-debian
-  /   |  |   \\    CPU: 11th Gen Intel i7
- /_-''    ''-_\\   Memory: 16 GB RAM
-                  GPU: NVIDIA RTX 4050 (6 GB GDDR6)
-                  Shell: bash 5.2.15
-                  Browser: Firefox (pre-installed)
-`;
+                    outputLine.innerText =
+`         _,met$$$$$gg.           cross-os@debian
+      ,g$$$$$$$$$$$$$$$p.        ----------------
+    ,g$$$$"     ""$$$$$$.        OS: Cross-OS (Debian GNU/Linux 12)
+  ,g$$$$"         "$$$$$$        Host: Custom PC Build Simulation
+ ,$$$$"             "$$$$        Kernel: 6.1.0-debian
+ $$$$"               "$$$        Uptime: 42 mins
+ $$$$                 $$$        Packages: 1420 (dpkg)
+ $$$$                 $$$        Shell: bash 5.2.15
+ $$$$.               ,$$$        CPU: 11th Gen Intel i7
+  $$$$g.           ,g$$$"        GPU: NVIDIA RTX 4050 (6 GB GDDR6)
+   "$$$$$p.     ,g$$$$"          Memory: 4096MB / 16384MB
+     "$$$$$$$$$$$$$$"
+        ""$$$$$$""`;
                 } else if (command === 'clear') {
                     termBody.innerHTML = '';
                     termBody.appendChild(inputElem.parentElement);
@@ -356,6 +478,12 @@ Type "help" or run "neofetch" to check your hardware profile.
                 } else if (command === 'firefox') {
                     openWindow('window-firefox');
                     outputLine.innerText = "Launching Firefox...";
+                } else if (command === 'gimp') {
+                    openWindow('window-gimp');
+                    outputLine.innerText = "Launching GIMP...";
+                } else if (command === 'minecraft') {
+                    openWindow('window-minecraft');
+                    outputLine.innerText = "Launching Minecraft...";
                 } else if (command === 'date') {
                     outputLine.innerText = new Date().toString();
                 } else if (command === '') {
